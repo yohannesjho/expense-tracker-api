@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const db = require('../models/db')
+const jwt = require('jsonwebtoken')
 
 
 async function SignUp (req,res){
@@ -14,6 +15,21 @@ async function SignUp (req,res){
         res.status(201).send('user is registered')
     } catch (error) {
         res.status(500).send('error signing up')
+    }
+}
+
+async function SignIn (req,res){
+    const {email,password} = req.body
+    try {
+        const [users] = await db.query('SELECT * FROM user WHERE ?',[email])
+        if(users.length == 0) return res.status(401).send('invalid credentials')
+        const user = users[0]
+        const isMatch = await bcrypt.compare(password,user.password)
+        if(!isMatch) return res.status(401).send('invalid credential')
+        const token = jwt.sign({id:user.id},process.env.JWT_SECRET,{expiresIn:'1d'})
+        res.json({token})
+    } catch (error) {
+        res.status(500).send('error signing')
     }
 }
 
