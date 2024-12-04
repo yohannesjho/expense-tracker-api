@@ -33,4 +33,4 @@ async function SignIn (req,res){
     }
 }
 
-module.exports = { SignUp}
+module.exports = { SignUp,SignIn}

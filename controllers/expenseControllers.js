@@ -35,3 +35,5 @@ async function filterExpenses(req, res) {
     }
 }
 
+module.exports = {addExpense,filterExpenses}
+
