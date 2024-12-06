@@ -1,14 +1,32 @@
 const db = require('../models/db')
 
 
+
 async function addExpense(req, res) {
-    const { amount, descripion, category, date } = req.body
+    const { amount, description, category, date } = req.body
+    console.log(req.body)
 
     try {
-        const [result] = await db.query('INSERT INTO expenses VALUES ?,?,?,?,?', [amount, descripion, date, category])
-        res.status(201).rend('expense added')
+        const [result] = await db.query('INSERT INTO expenses(user_id, amount, description,  category, date) VALUES (?,?,?,?,?)', [req.user.id, amount, description, category, date])
+        res.status(201).send('expense added')
     } catch (error) {
+        console.log(error)
         res.status(500).send('error adding expense')
+    }
+}
+async function updateExpense(req, res) {
+    const { amount, description, category } = req.body
+    console.log(amount,description, category)
+    try {
+        const [result] = await db.query(
+            'UPDATE expenses SET amount = ?, description = ?, category = ? WHERE user_id = ?',
+            [amount, description, category, req.user.id]
+        );
+        
+        res.status(201).send('expense updated')
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('error updatig expense')
     }
 }
 
@@ -31,9 +49,9 @@ async function filterExpenses(req, res) {
         const [expenses] = await db.query(query, params)
         res.json(expenses)
     } catch (error) {
-       res.status(500).send('error fetching expenses')
+        res.status(500).send('error fetching expenses')
     }
 }
 
-module.exports = {addExpense,filterExpenses}
+module.exports = { addExpense, filterExpenses, updateExpense }
 
