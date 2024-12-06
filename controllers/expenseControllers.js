@@ -1,7 +1,5 @@
 const db = require('../models/db')
 
-
-
 async function addExpense(req, res) {
     const { amount, description, category, date } = req.body
     console.log(req.body)
@@ -12,6 +10,17 @@ async function addExpense(req, res) {
     } catch (error) {
         console.log(error)
         res.status(500).send('error adding expense')
+    }
+}
+
+async function getAllExpenses(req,res){
+    try {
+        const [result] = await db.query('SELECT * FROM expenses WHERE user_id = ?',[req.user.id])
+        console.log(result)
+        res.status(201).json(result)
+    } catch (error) {
+        res.status(500).send('error getting expenses')
+        
     }
 }
 async function updateExpense(req, res) {
@@ -64,5 +73,5 @@ async function filterExpenses(req, res) {
     }
 }
 
-module.exports = { addExpense, filterExpenses, updateExpense,deleteExpense }
+module.exports = { addExpense, filterExpenses, updateExpense,deleteExpense,getAllExpenses }
 
