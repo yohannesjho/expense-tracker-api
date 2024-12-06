@@ -16,17 +16,28 @@ async function addExpense(req, res) {
 }
 async function updateExpense(req, res) {
     const { amount, description, category } = req.body
-    console.log(amount,description, category)
+    console.log(amount,description, category, req.params)
     try {
         const [result] = await db.query(
-            'UPDATE expenses SET amount = ?, description = ?, category = ? WHERE user_id = ?',
-            [amount, description, category, req.user.id]
+            'UPDATE expenses SET amount = ?, description = ?, category = ? WHERE user_id = ? AND id = ?',
+            [amount, description, category, req.user.id, req.params.id]
         );
         
         res.status(201).send('expense updated')
     } catch (error) {
         console.log(error)
         res.status(500).send('error updatig expense')
+    }
+}
+
+async function deleteExpense(req,res){
+    try {
+        const [result] = await db.query('DELETE FROM expenses WHERE user_id = ? AND id = ?',
+            [req.user.id, req.params.id]
+        )
+        res.status(201).send('expense deleted successfully')
+    } catch (error) {
+        res.status(500).send('error deleteing expense')
     }
 }
 
@@ -53,5 +64,5 @@ async function filterExpenses(req, res) {
     }
 }
 
-module.exports = { addExpense, filterExpenses, updateExpense }
+module.exports = { addExpense, filterExpenses, updateExpense,deleteExpense }
 
